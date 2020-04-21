@@ -1,0 +1,2 @@
+ftp://download.big.ac.cn/gsa3/CRA002517/CRR127980/CRR127980_f1.fq.gz L1_1.fq.gz
+ftp://download.big.ac.cn/gsa3/CRA002517/CRR127980/CRR127980_r2.fq.gz L1_2.fq.gz

@@ -1,0 +1,143 @@
+# global tree options
+ignore_branch_len	0
+total_plotted_degrees	360
+start_rotation	-96
+clade_separation	0.0
+branch_bracket_depth	0.8 
+branch_bracket_width	0.5
+branch_thickness	0.75
+#branch_color	
+#branch_color_from_ancestor
+
+# global graphical options
+annotation_background_width	0.60
+#annotation_background_alpha 
+annotation_background_separation	-0.5		
+#annotation_background_offset 
+#annotation_legend_font_size
+
+
+# detailed tree options
+clade_marker_size	16
+
+## clad_marker_shap is default
+#clade_marker_shape 
+
+## clay_marker_edge_width
+clade_marker_edge_width	0.25
+
+## clay_marker_edge_color is default
+#clade_marker_edge_color 
+
+## clade_marker_font_color is default black
+#clade_marker_font_color
+
+# detailed annotation (need modifications)
+## annotation, rotation, annotation_background_color 
+
+## clay_mark_color and branch color (need modifications)
+### phylum level
+p__Actinobacteria*	clade_marker_color	#EF5656
+p__Proteobacteria*	clade_marker_color	#2BB065
+p__Bacteroidetes*	clade_marker_color	#47B3DA
+p__Firmicutes*	clade_marker_color	#F7A415
+
+#### phylum level
+p__Proteobacteria	annotation_background_color	#B0FFC0
+p__Actinobacteria	annotation_background_color	#FFB0B0
+p__Bacteroidetes	annotation_background_color	#B0E9FD
+p__Firmicutes	annotation_background_color	#FCDBA2
+
+Comamonadaceae	annotation	*
+Comamonadaceae	annotation_rotation	90
+Comamonadaceae	annotation_background_color	#85F29B
+Burkholderiales	annotation	*
+Burkholderiales	annotation_rotation	90
+Burkholderiales	annotation_background_color	#85F29B
+Microbacteriaceae	annotation	*
+Microbacteriaceae	annotation_rotation	90
+Microbacteriaceae	annotation_background_color	#F58D8D
+Bradyrhizobiaceae	annotation	*
+Bradyrhizobiaceae	annotation_rotation	90
+Bradyrhizobiaceae	annotation_background_color	#85F29B
+Xanthomonadaceae	annotation	*
+Xanthomonadaceae	annotation_rotation	90
+Xanthomonadaceae	annotation_background_color	#85F29B
+Cellulomonadaceae	annotation	*
+Cellulomonadaceae	annotation_rotation	90
+Cellulomonadaceae	annotation_background_color	#F58D8D
+Enterobacteriaceae	annotation	*
+Enterobacteriaceae	annotation_rotation	90
+Enterobacteriaceae	annotation_background_color	#85F29B
+Methylophilaceae	annotation	*
+Methylophilaceae	annotation_rotation	90
+Methylophilaceae	annotation_background_color	#85F29B
+Nocardioidaceae	annotation	*
+Nocardioidaceae	annotation_rotation	90
+Nocardioidaceae	annotation_background_color	#F58D8D
+Rhizobiaceae	annotation	*
+Rhizobiaceae	annotation_rotation	90
+Rhizobiaceae	annotation_background_color	#85F29B
+Bacillales	annotation	*
+Bacillales	annotation_rotation	90
+Bacillales	annotation_background_color	#F7C875
+Sphingomonadaceae	annotation	*
+Sphingomonadaceae	annotation_rotation	90
+Sphingomonadaceae	annotation_background_color	#85F29B
+Rhodocyclaceae	annotation	*
+Rhodocyclaceae	annotation_rotation	90
+Rhodocyclaceae	annotation_background_color	#85F29B
+Caulobacteraceae	annotation	*
+Caulobacteraceae	annotation_rotation	90
+Caulobacteraceae	annotation_background_color	#85F29B
+Hyphomicrobiaceae	annotation	*
+Hyphomicrobiaceae	annotation_rotation	90
+Hyphomicrobiaceae	annotation_background_color	#85F29B
+Burkholderiaceae	annotation	*
+Burkholderiaceae	annotation_rotation	90
+Burkholderiaceae	annotation_background_color	#85F29B
+Aeromonadaceae	annotation	*
+Aeromonadaceae	annotation_rotation	90
+Aeromonadaceae	annotation_background_color	#85F29B
+Pseudomonadaceae	annotation	*
+Pseudomonadaceae	annotation_rotation	90
+Pseudomonadaceae	annotation_background_color	#85F29B
+Sinobacteraceae	annotation	*
+Sinobacteraceae	annotation_rotation	90
+Sinobacteraceae	annotation_background_color	#85F29B
+Flavobacteriaceae	annotation	*
+Flavobacteriaceae	annotation_rotation	90
+Flavobacteriaceae	annotation_background_color	#91DBF6
+Rhizobiales	annotation	*
+Rhizobiales	annotation_rotation	90
+Rhizobiales	annotation_background_color	#85F29B
+Intrasporangiaceae	annotation	*
+Intrasporangiaceae	annotation_rotation	90
+Intrasporangiaceae	annotation_background_color	#F58D8D
+Erythrobacteraceae	annotation	*
+Erythrobacteraceae	annotation_rotation	90
+Erythrobacteraceae	annotation_background_color	#85F29B
+Bacillaceae	annotation	*
+Bacillaceae	annotation_rotation	90
+Bacillaceae	annotation_background_color	#F7C875
+Sneathiellaceae	annotation	*
+Sneathiellaceae	annotation_rotation	90
+Sneathiellaceae	annotation_background_color	#85F29B
+Moraxellaceae	annotation	*
+Moraxellaceae	annotation_rotation	90
+Moraxellaceae	annotation_background_color	#85F29B
+Thermomonosporaceae	annotation	*
+Thermomonosporaceae	annotation_rotation	90
+Thermomonosporaceae	annotation_background_color	#F58D8D
+Streptosporangiaceae	annotation	*
+Streptosporangiaceae	annotation_rotation	90
+Streptosporangiaceae	annotation_background_color	#F58D8D
+Chitinophagaceae	annotation	*
+Chitinophagaceae	annotation_rotation	90
+Chitinophagaceae	annotation_background_color	#91DBF6
+Micromonosporaceae	annotation	*
+Micromonosporaceae	annotation_rotation	90
+Micromonosporaceae	annotation_background_color	#F58D8D
+Rhodobacteraceae	annotation	*
+Rhodobacteraceae	annotation_rotation	90
+Rhodobacteraceae	annotation_background_color	#85F29B
