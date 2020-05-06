@@ -6,7 +6,7 @@
 # Jingying Zhang, Yong-Xin Liu, et. al. NRT1.1B is associated with root microbiota composition and nitrogen use in field-grown rice. Nature Biotechnology 37, 676-684, doi:10.1038/s41587-019-0104-4 (2019).
 
 # 手动运行脚本，使用 Ctrl+Shift+H 或 Session 需要设置工作目录
-# Set Work Directory - Choose Directory / To Source File Location 设置工作目录
+# Set Work Directory - Choose Directory / To Source File Location
 
 # Clean enviroment object
 rm(list=ls()) 
@@ -21,8 +21,10 @@ options(warn = -1) # Turn off warning
 
 # 1.2 参数 Parameters #----
 # 设置清华源加速下载
+# (Optional) Set up Tsinghua Mirror to speed up download
 site="https://mirrors.tuna.tsinghua.edu.cn/CRAN"
-# 判断命令行解析是否安装，安装并加载
+# 判断命令行解析包是否安装，没安装则安装，然后加载
+# Determine whether the command line parsing package is installed, install it if it is not installed, then load
 if (!suppressWarnings(suppressMessages(require("optparse", character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)))) {
   install.packages("optparse", repos=site)
   require("optparse",character.only=T)
@@ -49,13 +51,13 @@ print(opts)
 # Install related packages
 if (FALSE){
   source("https://bioconductor.org/biocLite.R")
-  biocLite(c("ggplot2","grid","scales","vegan","dplyr"))
+  biocLite(c("ggplot2","grid","scales","dplyr")) # ,"vegan"
 }
 # load related packages
 suppressWarnings(suppressMessages(library("ggplot2")))
 suppressWarnings(suppressMessages(library("dplyr")))
 suppressWarnings(suppressMessages(library("scales")))
-suppressWarnings(suppressMessages(library("vegan")))
+# suppressWarnings(suppressMessages(library("vegan")))
 suppressWarnings(suppressMessages(library("grid")))
 
 # Set ggplot2 drawing parameter, such as axis line and text size, lengend and title size, and so on.

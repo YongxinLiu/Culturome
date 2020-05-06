@@ -139,10 +139,10 @@ extract_barcodes.py \
 split_libraries_fastq.py \
     -i tmp/${l}/reads.fastq \
     -b tmp/${l}/barcodes.fastq \
-	-m seq/${l}.txt \
-	-q 19 --max_barcode_errors 0 \
-	--barcode_type 16 --phred_offset 33 \
-	-o tmp/${l}
+    -m seq/${l}.txt \
+    -q 19 --max_barcode_errors 0 \
+    --barcode_type 16 --phred_offset 33 \
+    -o tmp/${l}
 # format to usearch
 cut -f 1 -d ' ' tmp/${l}/seqs.fna \
     | sed 's/_/./' \
@@ -166,23 +166,22 @@ done
 
 # 6. Cut primers
 usearch -fastx_truncate tmp/qc.fa \
-	-stripleft 19 -stripright 18 \
-	-fastaout tmp/filtered.fa
+    -stripleft 19 -stripright 18 \
+    -fastaout tmp/filtered.fa
 
 
 # 7. Pick representitve sequences
 # Calculate frequency of non-reduncancy reads, 4s
 vsearch \
     --derep_fulllength tmp/filtered.fa \
-	--relabel Uni --minuniquesize 8 --sizeout \
-	--output tmp/uniques.fa 
+    --relabel Uni --minuniquesize 8 --sizeout \
+    --output tmp/uniques.fa 
 # Denoise by unoise3, 2s
 usearch -unoise3 tmp/uniques.fa \
     -zotus tmp/Zotus.fa
 # Rename to ASV
 awk 'BEGIN {n=1}; />/ {print ">ASV_" n; n++} !/>/ {print}' tmp/Zotus.fa \
-    > tmp/otus.fa
-cp tmp/otus.fa result/otu.fa
+    > result/ASV.fa
 
 
 # 8. (Optional) Remove host and unspecific amplification
@@ -190,37 +189,39 @@ cp tmp/otus.fa result/otu.fa
 
 # 9. Construct ASV table
 vsearch --usearch_global tmp/filtered.fa \
-    --db result/otu.fa \
-    --otutabout tmp/otutab.txt \
+    --db result/ASV.fa \
+    --otutabout tmp/ASV_table.txt \
     --id 0.97
 
 
 # 10. Calculate 100%(1) false discovery reads, mean cut all negative control
 negative_threshold.R \
-    --input tmp/otutab.txt \
+    --input tmp/ASV_table.txt \
     --metadata result/metadata.txt \
     --threshold 1 \
     --negative A12 \
     --positive B12 \
     --output result/fdr.txt
 # Filter flase discovery well in feature table
-usearch -otutab_trim tmp/otutab.txt \
-    -output result/otutab.txt \
+usearch -otutab_trim tmp/ASV_table.txt \
+    -output result/ASV_table.txt \
     -min_sample_size `cat result/fdr.txt` 
 
 
 # 11. Taxonomic classification
-usearch -sintax result/otu.fa \
+usearch -sintax result/ASV.fa \
     -db ${wd}/db/rdp_16s_v16_sp.fa \
-	-tabbedout tmp/otu.fa.tax \
+	-tabbedout tmp/ASV.fa.tax \
 	-sintax_cutoff 0.6 -strand both
-tax_sum.sh -i tmp/otu.fa.tax -t tmp/
+tax_sum.sh -i tmp/ASV.fa.tax \
+    -d result/ASV_table.txt \
+    -o result/
 
 
 ## Plotting taxonomy(no response)
 ## Prepare graphlan files
 #graphlan_prepare_order.R \
-#    --input result/otutab.txt \
+#    --input result/ASV_table.txt \
 #    --output result/graphlan/ \
 #    --taxonomy result/taxonomy_8.txt \
 #    --abundance 0 \
@@ -233,7 +234,7 @@ tax_sum.sh -i tmp/otu.fa.tax -t tmp/
 
 # 12. Identify non-redundancy isolates
 identify_isolate.R \
-    --input result/otutab.txt \
+    --input result/ASV_table.txt \
     --taxonomy result/taxonomy_8.txt \
     --output result/isolate
 
@@ -242,7 +243,7 @@ identify_isolate.R \
 # Fetch purity in result table
 mkdir -p result/purity
 for l in `cat result/library.txt`; do
-awk 'NR==FNR{a[$1]=$3}NR>FNR{print $1"\t"a[$1]}' result/isolate_sample.txt seq/${l}.txt | tail -n+2 | sed 's/\t$/\t0/' \
+awk 'NR==FNR{a[$1]=$3}NR>FNR{print $1"\t"a[$1]}' result/isolate_well.txt seq/${l}.txt | tail -n+2 | sed 's/\t$/\t0/' \
     > result/purity/${l}.txt
 # Format list into plate format
 format_list2plate.pl -i result/purity/${l}.txt \
@@ -252,7 +253,7 @@ format_list2plate.pl -i result/purity/${l}.txt \
 list=`ls result/purity/${l}/|cut -f 1 -d '.'|cut -f 2 -d 'P'|sort|uniq|head -n3`
 for plate in $list;do 
     plot_pheatmap.sh -i result/purity/${l}/${l}P${plate}.plate \
-        -o result/purity/${l}/${l}P${plate}.plate.heat.png
+        -o result/purity/${l}/${l}P${plate}.png
 done
 done
 rm -rf plot_pheatmap.r Rplots.pdf

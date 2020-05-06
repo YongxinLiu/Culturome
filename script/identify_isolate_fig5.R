@@ -49,13 +49,13 @@ print(opts)
 # Install related packages
 if (FALSE){
   source("https://bioconductor.org/biocLite.R")
-  biocLite(c("ggplot2","grid","scales","vegan","dplyr"))
+  biocLite(c("ggplot2","grid","scales","dplyr")) # ,"vegan"
 }
 # load related packages
 suppressWarnings(suppressMessages(library("ggplot2")))
 suppressWarnings(suppressMessages(library("dplyr")))
 suppressWarnings(suppressMessages(library("scales")))
-suppressWarnings(suppressMessages(library("vegan")))
+# suppressWarnings(suppressMessages(library("vegan")))
 suppressWarnings(suppressMessages(library("grid")))
 
 # Set ggplot2 drawing parameter, such as axis line and text size, lengend and title size, and so on.
@@ -165,6 +165,58 @@ sample_stat = arrange(sample_stat, ID, desc(Purity), desc(Count))
 sample_stat = sample_stat[,-10]
 suppressWarnings(write.table(sample_stat, file=paste(opts$output, "_well.txt", sep=""), append = T, sep="\t", quote=F, row.names=F, col.names=T))
 
+
+# 2.3.2 纯度和比例曲线 #----
+
+purity=as.data.frame(cbind(1:100, 100:1))
+colnames(purity) = c("Purity", "Count")
+for(i in 1:100) {
+  idx = sample_stat$Purity>=i
+  purity[i,]$Count = dim(sample_stat[idx,])[1]
+}
+purity$Percentage = round(purity$Count / dim(sample_stat)[1] * 100, digits = 3)
+
+
+g1 = ggplot(purity, aes(Purity,Percentage )) + geom_line(colour = 'blue') + xlim(50, 100) + ylim(0, 100) + main_theme +  labs(x = "Purity (%)", y = 'Percentage (%)') 
+g1
+ggsave(paste(opts$output, ".DistributionPurityPer.pdf", sep=""), g1, width = 89, height = 59*0.7, unit = "mm")
+
+# 2.3.3 histgram图 #----
+sample_stat$media="TSB"
+# library(ggpubr) # 服务器版本不可用
+# gghistogram(sample_stat, x="Purity", add = "mean", rug = TRUE, color = "media", fill = "media",
+#             palette = c("#00AFBB")) # , "#E7B800"
+
+p = ggplot(sample_stat,aes(Purity))
+p + geom_histogram(position = 'identity',
+                   alpha=0.5, bins = 30,
+                   aes(y = ..density..,
+                       fill = factor(media))) + main_theme
+
+# +stat_density(geom = 'line', position = 'identity', aes(colour = factor(media)))
+
+# 手动分组
+# 100，>=95, =90>, ...0,生成等差数列 
+gl = seq(from=100, to=0, by=-5)
+purity=as.data.frame(cbind(gl, count = 1:length(gl)))
+tmp = sample_stat
+j = 1
+for (i in gl){
+  idx = tmp$Purity >= i
+  purity[j,]$count = dim(tmp[idx,])[1]
+  j= j+1
+  tmp = tmp[!idx,]
+}
+purity$Percentage = round(purity$count / dim(sample_stat)[1] * 100, digits = 3)
+purity$color = "blue"
+purity$Purity = factor(purity$gl, levels = purity$gl)
+p = ggplot(purity, aes(Purity,Percentage, fill = color )) + 
+  geom_bar(stat="identity", position = "dodge",width=0.7) + main_theme +  labs(x = "Purity (%)", y = 'Percentage of wells (%)') + theme(legend.position = "NA",axis.text.x = element_text(angle = 45,vjust=1, hjust=1)) 
+# + xlim(50, 100) + ylim(0, 100) 
+p
+ggsave(paste(opts$output, ".DistributionPurityPer.pdf", sep=""), p, width = 89, height = 59*0.7, unit = "mm")
+ggsave(paste(opts$output, ".DistributionPurityPer.png", sep=""), p, width = 89, height = 59, unit = "mm")
+suppressWarnings(write.table(purity, file=paste(opts$output, "_DistributionPurityPer.txt", sep=""), append = T, sep="\t", quote=F, row.names=F, col.names=T))
 
 # 2.4 非冗余候选 Identify non-redundancy isolates #----
 
@@ -285,3 +337,15 @@ p = ggplot(dfAll, aes(Number, Freq, fill = tax)) +
 p
 ggsave(paste(opts$output, ".Distribution.pdf", sep=""), p, width = 89, height = 59*0.7, unit = "mm")
 ggsave(paste(opts$output, ".Distribution.png", sep=""), p, width = 89, height = 59, unit = "mm")
+
+# 2.4.2 绘制百分比图 #----
+dfAll$Percentage = round(dfAll$Freq / sum(dfAll[1:TopN,]$Freq) * 100, digits =3)
+
+p = ggplot(dfAll, aes(Number, Percentage, fill = tax)) + 
+  geom_bar(stat="identity", position = "dodge",width=0.7) + main_theme +
+  theme(legend.position = c(0.8, 0.8))
+p
+ggsave(paste(opts$output, ".DistributionPer.pdf", sep=""), p, width = 89, height = 59*0.7, unit = "mm")
+ggsave(paste(opts$output, ".DistributionPer.png", sep=""), p, width = 89, height = 59, unit = "mm")
+suppressWarnings(write.table(dfAll, file=paste(opts$output, "_DistributionPer.txt", sep=""), append = T, sep="\t", quote=F, row.names=F, col.names=T))
+

@@ -4,7 +4,7 @@
 
 Authors: Yong-Xin Liu (yxliu@genetics.ac.cn), Yuan Qin (yqin@genetics.ac.cn)
 
-Date: 2020-04-21
+Date: 2020-05-6
 
 This is an example pipeline for one library. As for multiple libraries, please followed `pipeline_multiple.md`.
 
@@ -15,7 +15,8 @@ Jingying Zhang, Yong-Xin Liu, Na Zhang, Bin Hu, Tao Jin, Haoran Xu, Yuan Qin, Pe
 
 Modify `wd` to absolute directory of `Culturome`, then run the following script to initial your environment. `l` set your library ID.
 
-    wd=/mnt/bai/yongxin/github/Culturome
+    #wd=/mnt/bai/yongxin/github/Culturome
+    wd=/home/qiime/Culturome-master
     PATH=${wd}/script:$PATH
     mkdir -p temp result
     l=L1
@@ -123,7 +124,7 @@ Visualize sequence counts from each plate to check success and evenness of ampli
 
 Remove forward and reverse primers of sequences, length according to primers.
 
-    # 5-30s
+    # 5 ~ 30s
     usearch -fastx_truncate temp/qc.fa \
     	-stripleft 19 -stripright 18 \
     	-fastaout temp/filtered.fa 
@@ -150,7 +151,7 @@ Remove the redundancy of all reads, and calculate the frequency of reads. Then u
 
 Identify bacteria in each well of 96-well microtiter plates, by quantifying the ASV abundance through mapping all clean sequences to ASVs using VSEARCH. 
 
-	# 99% matched, 1m
+	# 99% matched, 1~3m
 	vsearch \
 	    --usearch_global temp/filtered.fa \
 	    --db result/ASV.fa \
@@ -192,7 +193,7 @@ Based on RDP train set 16 databases, use sintax to classify taxonomy of ASV.
 
     # 30s, cutoff set 0.6
     usearch -sintax result/ASV.fa \
-	    -db ${wd}/db/rdp_16s_v16_sp.fa \
+	    -db rdp_16s_v16_sp.fa \
     	-tabbedout temp/ASV.fa.tax \
     	-sintax_cutoff 0.6 -strand both
     # summary phylum and genus, format to table
@@ -262,7 +263,19 @@ Summarize the taxonomic distribution and occurrence frequency of cultivated bact
 
 **Fig 8. Cladogram showing the taxonomic distribution and occurrence frequency of cultivated bacteria.** The inner ring represents the dereplicated ASVs from cultivated root bacteria. Heat map in the outer ring represent the log2 transformed number of cultivated bacterial isolates belong to the corresponding ASV.
 
-### 13. Project cleanup
+
+### 13.	(Optional) Cross-reference the cultivated bacteria with 16S  profile
+
+Cross-reference the cultivated bacteria with the corresponding root microbiome profiling data using the similarity of V5-V7 regions in the 16S rRNA gene. 
+
+    cross_reference.sh \
+        -i script/profiling_ASV.fa \
+        -d script/profiling_ASVtab.txt \
+        -r result/ASV.fa \
+        -o result/cross_reference.txt
+
+
+### 14. Project cleanup
 
 When the project is complete, you can compress input files and delete temporary files to save space.
 
