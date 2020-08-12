@@ -1,10 +1,8 @@
-[TOC]
-
 # Culturome pipeline v1.0 (multiple)
 
 Authors: Yong-Xin Liu (yxliu@genetics.ac.cn), Yuan Qin (yqin@genetics.ac.cn)
 
-Date: 2020-04-21
+Date: 2020-08-12
 
 This is an example pipeline for multiple libraries.
 

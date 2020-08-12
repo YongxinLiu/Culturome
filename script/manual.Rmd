@@ -18,25 +18,26 @@ knitr::opts_chunk$set(echo = TRUE)
 ![](fig/webMetadata.jpg)
 Instructions for filling in each column
 
-1.	\#SampleID: Well ID, format is column library + plate + well. Must be start with alphabet.
+1.	\#SampleID: the format is library + plate + well. Sample IDs must start with alphabet.
 
-2.	BarcodeSequence: Well barcode (barcodeF) + Plate barcode (barcodeR), diagram in figure 1.
+2.	BarcodeSequence: well barcode (barcodeF) + plate barcode (barcodeR).
 
-3.	LinkerPrimerSequence: Forward primer, such as ACGTCATCCCCACCTTCC (799F).
+3.	LinkerPrimerSequence: forward primer, such as AACMGGATTAGATACCCKG (799F).
 
-4.	ReversePrimer: Forward primer, such as ACGTCATCCCCACCTTCC (1193R).
+4.	ReversePrimer: reverse primer, such as ACGTCATCCCCACCTTCC (1193R).
 
-5.	barcodeF：Well barcode, according to Supplementary table 1.
+5.	barcodeF：Well barcode, according to [96 forward barcode in Supplementary table 1](barcodeF96.txt).
 
-6.	barcodeR：Plate barcode, according to Supplementary table 1.
+6.	barcodeR：Plate barcode, according to [48 reverse barcode in Supplementary table 1](barcodeR48.txt).
 
-7.	library: ID of library, format is alphabet+number, such as L1/L2.
+7.	library: ID of sequencing library. The format is alphabet+number, such as L1.
 
-8.	plate: Plate ID, three characters, such as P01/P02…P48.
+8.	plate: ID of 96-well cell culture plates. The IDs should include three characters, such as P01, P02…P48.
 
-9.	well: Well ID, from A1, A2, …  H12.
+9.	well: ID of individual wells, such as A1, A2, … H12.
 
-10.	Description: Must contained column at the end, but the content can fill anything.
+10.	Description: this column is required in the end, but the content can be filled with anything.
+
 
 ## [Returen to homepage](http://bailab.genetics.ac.cn/culturome)
 
