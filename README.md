@@ -1,3 +1,5 @@
+[TOC]
+
 # High-throughput cultivation and identification of bacteria from the plant root microbiota (Culturome)
 
 This is the computational part of the detailed protocol for high-throughput bacterial isolation and cultivation. Now it is prepared for Nature Protocols.
@@ -153,16 +155,13 @@ If you have only one sequencing library, please follow the instruction in pipeli
 
 ## ? TROUBLESHOOTING
 
-- wget download and rename problem, result only 8kb.
+wget download and rename problem, result only 8kb.
 Try download and rename seperate.
 
-
-    # Download CRR127980 and rename as L1
     wget -c ftp://download.big.ac.cn/gsa3/CRA002517/CRR127980/CRR127980_f1.fq.gz
     mv CRR127980_f1.fq.gz L1_1.fq.gz
     wget -c ftp://download.big.ac.cn/gsa3/CRA002517/CRR127980/CRR127980_r2.fq.gz
     mv CRR127980_r2.fq.gz L1_2.fq.gz
-    # decompress
     gunzip *.gz
  
 ## Contact
