@@ -134,7 +134,7 @@ print(paste("Rarefaction curve in ",opts$output, "_rare_curve.pdf/png", sep=""))
 # 2.3 样品丰度和物种 Sample taxonomy and abundance #----
 
 # 样品中ASV种类与丰度统计
-# 统计每个孔中的前三个OTU
+# 统计每个孔中的前三个OTU，有些ASV丰度不在前3会丢失
 sample=dim(otu_table)[2]
 sample_stat=as.data.frame(cbind(1:sample,colnames(otu_table)))
 rownames(sample_stat)=sample_stat$V2
@@ -156,17 +156,18 @@ for(i in 1:sample) {
     sample_stat[i,10]="NA"
   }
 }
-# 选菌原则：同一OTU，纯度优先、数据量第二，最多选前三；输出OTU, purity-count-
 sample_stat=sample_stat[,-1]
 colnames(sample_stat)=c("SampleID","Count","Purity","ASV","Taxonomy","Count2","Purity2","ASV2","Taxonomy2")
 sample_stat$ID=as.numeric(gsub("ASV_", "", sample_stat$ASV))
+# 按纯度、计数值排序
 sample_stat = arrange(sample_stat, ID, desc(Purity), desc(Count))
 sample_stat = sample_stat[,-10]
-suppressWarnings(write.table(sample_stat, file=paste(opts$output, "_well.txt", sep=""), append = T, sep="\t", quote=F, row.names=F, col.names=T))
+suppressWarnings(write.table(sample_stat, file=paste(opts$output, "_well.txt", sep=""), append = F, sep="\t", quote=F, row.names=F, col.names=T))
 
 print(paste("Well list in ",opts$output, "_well.txt", sep=""))
 
 # 2.4 非冗余候选 Identify non-redundancy isolates #----
+# 选菌原则：同一ASV，纯度优先、数据量第二，最多选前三；输出OTU, purity-count-
 
 # 读取孔信息并选菌
 sample_stat = read.delim(paste(opts$output, "_well.txt", sep=""), row.names= NULL, header=T, sep="\t", stringsAsFactors = F)
@@ -230,7 +231,7 @@ for(i in 1:sample) {
 ## 重命名行名
 colnames(otu_stat)=c("ID","Taxonomy","Well1","Purity1","Count1","Well2","Purity2","Count2","Well3","Purity3","Count3","Well4","Purity4","Count4","Well5","Purity5","Count5")
 ## 写入文件
-suppressWarnings(write.table(otu_stat, file=paste(opts$output, "_ASV.txt", sep=""), append = F, sep="\t", quote=F, row.names=F, col.names=T))
+suppressWarnings(write.table(otu_stat, file=paste(opts$output, "_ASV.txt", sep=""), sep="\t", quote=F, row.names=F, col.names=T))
 
 # print(paste("Output in ", opts$output, "_ASV.txt", "finished. 选菌候选表", sep = ""))
 # print(paste("Output in ", opts$output, "_well.txt", "finished. 每个孔的信息，包括丰度最高两种菌", sep = ""))

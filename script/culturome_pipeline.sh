@@ -43,17 +43,18 @@ OPTIONS:
 	-d directory of Culturome, default ${wd}
 	-n name of temp project, default ${name}
 	-o output directory, default ${output}
+	-m metadatafile, default ${metadata}
 	-? show help of script 显示帮助
 
 Example:
-culturome_pipeline.sh -i ${input} -d ${wd} -o ${output} -n ${name}
+culturome_pipeline.sh -i ${input} -d ${wd} -o ${output} -n ${name} -m ${metadata}
 
 EOF
 }
 
 
 # 参数解析 Analysis parameter
-while getopts "i:o:d:n:" OPTION
+while getopts "i:o:d:n:m:" OPTION
 do
 	case $OPTION in
 		i)
@@ -64,6 +65,9 @@ do
 			;;
 		n)
 			name=$OPTARG
+			;;
+		m)
+			metadata=$OPTARG
 			;;
 		o)
 			output=$OPTARG
@@ -81,6 +85,11 @@ cfg=${wd}/cfg/
 seq=tmp/${name}/seq
 # 临时文件
 tmp=tmp/${name}/tmp
+
+echo 'Please check the following parameters!'
+
+echo ${metadata}
+echo result/${name}
 
 
 # 清理工作环境
@@ -107,11 +116,17 @@ write_mapping_file.pl \
     -c Root -m TSB -B 1 -s Rice -d WildType \
     -o seq/${l}.txt
 done
+
 # Merge mapping file(s) into one metadata
 cat <(head -n1 seq/${l}.txt | sed 's/#//g') \
     <(cat seq/*.txt |grep -v '#'|grep -v -P '^SampleID\t') \
     > result/metadata.txt
 
+# 外源mapping file，有则替换metadata.txt
+if [ -f "${metadata}" ]; then
+    sed -i 's/#//' ${metadata}
+    mv ${metadata} result/metadata.txt
+fi
 
 # 2. (Optional)Validate mapping file
 
@@ -202,6 +217,7 @@ negative_threshold.R \
     --negative A12 \
     --positive B12 \
     --output result/fdr.txt
+
 # Filter flase discovery well in feature table
 usearch -otutab_trim tmp/ASV_table.txt \
     -output result/ASV_table.txt \
@@ -264,6 +280,8 @@ cat ${input} > result/input_file.txt
 cat /mnt/bai/yongxin/github/Culturome/README.md /mnt/bai/yongxin/github/Culturome/pipeline.md > result/Readme.md
 # 打包结果
 zip download/${name}.zip -r result/
+
+# touch download/${name}.zip
 
 # 清理项目中间文件
 # rm -rf seq/ result/

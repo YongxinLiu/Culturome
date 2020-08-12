@@ -35,9 +35,9 @@ suppressWarnings(suppressMessages(library(stringr)))
 # 解析参数-h显示帮助信息
 if (TRUE){
   option_list = list(
-    make_option(c("-i", "--input"), type="character", default="temp/otutab.txt",
+    make_option(c("-i", "--input"), type="character", default="temp/ASV_table.txt",
                 help="Unfiltered OTU table [default %default]"),
-    make_option(c("-m", "--metadata"), type="character", default="result/metadata.txt",
+    make_option(c("-m", "--metadata"), type="character", default="L1.txt",
                 help="metadata file or metadata [default %default]"),
     make_option(c("-n", "--negative"), type="character", default="A12",
                 help="Well ID of negative col [default %default]"),
@@ -130,6 +130,10 @@ write.table(a, opts$output, sep = "\t", quote = F, col.names = F,row.names = F, 
 control = rbind(sample_A12, sample_B12)
 control$well = factor(as.character(control$well), levels = unique(as.character(control$well)))
 levels(control$well) = c("Negative", "Positive")
+# 保存结果为表
+write.table(control, paste0(opts$output,".rawdata.txt"), sep = "\t", quote = F, col.names = T,row.names = F, na="")
+# 重设level顺序，正、负
+control$well = factor(control$well, levels = c("Positive", "Negative"))
 p = ggplot(control, aes(well, readssum, fill = well)) + 
   geom_boxplot(outlier.shape = NA) + geom_jitter() + 
   geom_hline(yintercept=a, linetype=2, color="blue") + 

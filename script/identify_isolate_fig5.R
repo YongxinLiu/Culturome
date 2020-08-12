@@ -131,11 +131,14 @@ ggsave(paste(opts$output, "_rare_curve1.pdf", sep=""), p, width = 89*2, height =
 ggsave(paste(opts$output, "_rare_curve.png", sep=""), p, width = 89*2, height = 59*1, unit = "mm")
 ggsave(paste(opts$output, "_rare_curve0.7.pdf", sep=""), p, width = 89*2, height = 59*0.7, unit = "mm")
 
+# 保存绘图数据
+colnames(rare_box) = c("Well numbers", "ASV number")
+write.table(rare_box, paste0(opts$output, "_rare_curve.txt"), sep = "\t", quote = F, col.names=T,row.names=F, na="")
 
 # 2.3 样品丰度和物种 Sample taxonomy and abundance #----
 
 # 样品中ASV种类与丰度统计
-# 统计每个孔中的前三个OTU
+# 统计每个孔中的前三个OTU，有些ASV丰度不在前3会丢失
 sample=dim(otu_table)[2]
 sample_stat=as.data.frame(cbind(1:sample,colnames(otu_table)))
 rownames(sample_stat)=sample_stat$V2
@@ -163,7 +166,14 @@ colnames(sample_stat)=c("SampleID","Count","Purity","ASV","Taxonomy","Count2","P
 sample_stat$ID=as.numeric(gsub("ASV_", "", sample_stat$ASV))
 sample_stat = arrange(sample_stat, ID, desc(Purity), desc(Count))
 sample_stat = sample_stat[,-10]
-suppressWarnings(write.table(sample_stat, file=paste(opts$output, "_well.txt", sep=""), append = T, sep="\t", quote=F, row.names=F, col.names=T))
+suppressWarnings(write.table(sample_stat, file=paste(opts$output, "_well.txt", sep=""), append =F, sep="\t", quote=F, row.names=F, col.names=T))
+
+
+# 为什么OTU数量从381变为315个？
+idx = rownames(otu_table) %in% unique(sample_stat$ASV)
+table(idx)
+# 缺失的66个ASV
+rownames(otu_table)[!idx]
 
 
 # 2.3.2 纯度和比例曲线 #----

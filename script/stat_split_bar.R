@@ -32,7 +32,7 @@ if (TRUE){
   option_list = list(
     make_option(c("-i", "--input"), type="character", default="result/metadata.txt",
                 help="Metadat [default %default]"),
-    make_option(c("-d", "--database"), type="character", default="result/split/L1s.txt",
+    make_option(c("-d", "--database"), type="character", default="result/split/L1.txt",
                 help="Reads counts of library [default %default]"),
     make_option(c("-o", "--output"), type="character", default="result/split",
                 help="Output directory [default %default]") 
@@ -137,9 +137,11 @@ p3 = ggplot(plate_count, aes(x=group, y=Count, fill=group))+
 # p3 + scale_fill_manual(values = rep(rainbow(7),7)[1:length(plate_count$group)])
 # 添加均值线
 p3 = p3 + geom_hline(yintercept=mean(plate_count$Count), linetype=2, color="blue") 
-  
+# p3  
 ggsave(paste(opts$output, "/", basename(opts$database), ".plate.pdf", sep=""), p3, width = 89, height = 59, unit = "mm")
 ggsave(paste(opts$output, "/", basename(opts$database), ".plate.png", sep=""), p3, width = 8, height = 5)
+
+write.table(plate_count, file=paste(opts$output, "/", basename(opts$database), ".plate.txt", sep=""),append = F, quote = F, sep="\t", eol = "\n", row.names = F, col.names = T)
 
 print(paste("Plate counts in ",opts$output, basename(opts$database), ".plate.pdf/png", sep=""))
 
