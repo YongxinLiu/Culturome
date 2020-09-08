@@ -222,7 +222,7 @@ False discovery rate control. Amplicon sequencing of each well is easily contami
 Taxonomic classification. Based on RDP train set 16 databases, we use sintax to classify taxonomy of ASV. The confidence cutoff set ot 0.6.
 
     usearch -sintax result/ASV.fa \
-	    -db ${wd}/db/rdp_16s_v16_sp.fa \
+	    -db ${wd}/rdp_16s_v16_sp.fa \
     	-tabbedout temp/ASV.fa.tax \
     	-sintax_cutoff 0.6 -strand both
     # summary phylum and genus, format to table, 3m
