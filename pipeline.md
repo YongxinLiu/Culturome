@@ -1,3 +1,5 @@
+[TOC]
+
 # Culturome pipeline v1.0
 
 Authors: Yong-Xin Liu (yxliu@genetics.ac.cn), Yuan Qin (yqin@genetics.ac.cn)
@@ -243,9 +245,10 @@ Table 3. Counts, purity and taxonomy in each well (`isolate_sample.txt`)
 **Figure 7. An example of the purity of wells containing cultivated bacteria in a 96-well cell culture plate.**
 
 
-### 12.Summarize the taxonomy
+### 12. Summarize the taxonomy
 
 53.	Summarize the taxonomic distribution and occurrence frequency of cultivated bacteria using GraPhlAn. Default labeled in families. More detail type `graphlan_prepare.R -h`. If too much families leads to overlapping text, plese using `graphlan_prepare_order.R` instead of `graphlan_prepare.R` to label in order level.
+
 
     # Prepare graphlan files
     graphlan_prepare_order.R \
