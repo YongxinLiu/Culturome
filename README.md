@@ -1,5 +1,3 @@
-[TOC]
-
 # High-throughput cultivation and identification of bacteria from the plant root microbiota (Culturome)
 
 This is the computational part of the detailed protocol for high-throughput bacterial isolation and cultivation. Now it is prepared for Nature Protocols.

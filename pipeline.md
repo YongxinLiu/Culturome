@@ -1,5 +1,3 @@
-[TOC]
-
 # Culturome pipeline v1.0
 
 Authors: Yong-Xin Liu (yxliu@genetics.ac.cn), Yuan Qin (yqin@genetics.ac.cn)
@@ -24,7 +22,7 @@ Download the demo data in the working directory.
 
     # Download test data and database
     wget -c ftp://download.big.ac.cn/gsa3/CRA002517/CRR127979/CRR127979_f1.fq.gz -O L1_1.fq.gz
-    #wget -c ftp://download.big.ac.cn/gsa3/CRA002517/CRR127979/CRR127979_r2.fq.gz -O L1_2.fq.gz
+    wget -c ftp://download.big.ac.cn/gsa3/CRA002517/CRR127979/CRR127979_r2.fq.gz -O L1_2.fq.gz
     wget -c http://www.drive5.com/sintax/rdp_16s_v16_sp.fa.gz
     gunzip *.gz
 
@@ -203,7 +201,7 @@ Classify the taxonomy of ASVs from cultivated bacteria based on the RDP train se
 
 ### 11. Identify non-redundancy isolates
 
-52.	Combining the ASV table and taxonomy, evaluate the saturation of bacterial ASV diversity based on the number of wells containing bacteria, obtain an overview of the distribution of wells containing different numbers of ASVs or genera, and examine the purity of the cultivated bacteria in each well. The outputs include two tables: an ASV list (`isolate_ASV.txt`, Supplementary Table 5) including five best wells containing bacteria with the corresponding 16S rRNA gene sequence and a well list (`isolate_well.txt`) including all detected ASV purity, read counts and taxonomy.
+Combining the ASV table and taxonomy, evaluate the saturation of bacterial ASV diversity based on the number of wells containing bacteria, obtain an overview of the distribution of wells containing different numbers of ASVs or genera, and examine the purity of the cultivated bacteria in each well. The outputs include two tables: an ASV list (`isolate_ASV.txt`, Supplementary Table 5) including five best wells containing bacteria with the corresponding 16S rRNA gene sequence and a well list (`isolate_well.txt`) including all detected ASV purity, read counts and taxonomy.
 
 
     # Claculate tables and figures, 2m
