@@ -6,6 +6,8 @@ Date: 2020-08-12
 
 This is an pipeline for one sequencing library. For multiple sequencing libraries, please follow `pipeline_multiple.md`.
 
+If use it, please cite: Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, doi: https://doi.org/10.1038/s41596-020-00444-7
+
 ## Procedure
 
 Modify `wd` to absolute directory of `Culturome`, then run the following script to initialize your environment. set your library ID in the variable `l`.

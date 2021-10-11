@@ -13,7 +13,7 @@ output=/var/www/html/culturome/tmp/result/
 # 输出目录名称
 name=email+time
 
-# 脚本功能描述 Function for script description and usage
+# 脚本功能描述 Function for script descriptionq and usage
 usage()
 {
 cat <<EOF >&2

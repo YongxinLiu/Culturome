@@ -1,6 +1,11 @@
+[TOC]
+
 # High-throughput cultivation and identification of bacteria from the plant root microbiota (Culturome)
 
-This is the computational part of the detailed protocol for high-throughput bacterial isolation and cultivation. Now it is prepared for Nature Protocols.
+This is the computational part of the detailed protocol for high-throughput bacterial isolation and cultivation. Now is published in Nature Protocols.
+
+> Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, doi: https://doi.org/10.1038/s41596-020-00444-7
+
 The overview of the workflow is in the following figures. 
 
 
@@ -132,11 +137,15 @@ Download the RDP taxonomy database; the USEARCH compatible format is available a
     wget -c http://www.drive5.com/sintax/rdp_16s_v16_sp.fa.gz
     gunzip *.gz
 
-  (Optional) To simplify the installation procedure for all computational software, we provide a fully installed VirtualBox image https://github.com/YongxinLiu/Culturome
+  (Optional) To simplify the installation procedure for all computational software, we provide a fully installed VirtualBox image http://210.75.224.110/culturome/download/QIIME-1.9.1-amd64.zip, and a webserver https://github.com/YongxinLiu/Culturome
 
 ## Analysis protocols
 
 If you have only one sequencing library, please follow the instruction in pipeline.md. If you have more than one sequencing library, please follow the instruction in pipeline_multiple.md.
+
+## Citation
+
+Jingying Zhang, Yong-Xin Liu, Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, doi: https://doi.org/10.1038/s41596-020-00444-7
 
 ## Reference
 
@@ -176,3 +185,5 @@ Tel: +86-10-64808722
 E-mail: yxliu@genetics.ac.cn
 
 Wechat: meta-genomics
+
+Cite: Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, doi: https://doi.org/10.1038/s41596-020-00444-7
