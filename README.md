@@ -4,7 +4,7 @@
 
 This is the computational part of the detailed protocol for high-throughput bacterial isolation and cultivation. Now is published in Nature Protocols.
 
-> Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, doi: https://doi.org/10.1038/s41596-020-00444-7
+> Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, 16(2): 988-1012: https://doi.org/10.1038/s41596-020-00444-7
 
 The overview of the workflow is in the following figures. 
 
@@ -115,7 +115,7 @@ To install VSEARCH, visit https://github.com/torognes/vsearch and follow the "Do
 
 To install R language and related packages:
 
-    conda install r-base r-dplyr r-optparse r-stringr r-ggplot2 r-pheatmap
+    conda install r-base r-dplyr r-optparse r-stringr r-ggplot2 r-pheatmap -c bioconda
     
 [To install GraPhlAn 1.1.3-1 by conda](https://bitbucket.org/nsegata/graphlan)
 

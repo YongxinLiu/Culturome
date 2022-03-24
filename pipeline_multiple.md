@@ -1,26 +1,32 @@
-# Culturome pipeline v1.0 (multiple)
+[TOC]
+
+# Culturome pipeline v1.1 (multiple)
 
 Authors: Yong-Xin Liu (yxliu@genetics.ac.cn), Yuan Qin (yqin@genetics.ac.cn)
 
-Date: 2020-08-12
+Date: 2022-03-21
 
 This is an example pipeline for multiple libraries.
 
 If you use this pipeline, please cite:
 
-Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, doi: https://doi.org/10.1038/s41596-020-00444-7
+Citation: Jingying Zhang, Yong-Xin Liu, Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert, et al. 2021. High-throughput cultivation and identification of bacteria from the plant root microbiota. **Nature Protocols** 16: 988-1012. https://doi.org/10.1038/s41596-020-00444-7
 
+## Procedure 
 
-## Procedure
+Setup work directory (`wd`) to your project.
 
-Modify `wd` to absolute directory of `Culturome`, then run the following script to initial your environment.
-
-    wd=/mnt/bai/yongxin/github/Culturome
-    PATH=${wd}/script:$PATH
+Modify `db` to absolute directory of `Culturome`, then run the following script to initial your environment.
+    
+    wd=~/culture/ginseng/C220314L7
+    db=/mnt/bai/yongxin/github/Culturome
+    PATH=${db}/script:$PATH
+    # PATH include software, conda and bin
+    # PATH=/mnt/bai/yongxin/github/Culturome/script:/mnt/bai/meta/miniconda3/envs/culturome/bin:/usr/bin:/bin
     rm -rf temp result
     mkdir -p seq temp result
 
-Make sure you have downloaded `Culturome` directory, and set the right path. Input fastq (unzipped) files in `seq` folder, and database in current folder is ready. The following codes to download example data, and database.
+(Option: test data)Make sure you have downloaded `Culturome` directory, and set the right path. Input fastq (unzipped) files in `seq` folder, and database in current folder is ready. The following codes to download example data, and database.
 
     # Download two example libraries
     wget -c ftp://download.big.ac.cn/gsa3/CRA002517/CRR127980/CRR127980_f1.fq.gz -O seq/L1_1.fq.gz
@@ -28,9 +34,6 @@ Make sure you have downloaded `Culturome` directory, and set the right path. Inp
     wget -c ftp://download.big.ac.cn/gsa3/CRA002517/CRR127982/CRR127982_f1.fq.gz -O seq/L2_1.fq.gz
     wget -c ftp://download.big.ac.cn/gsa3/CRA002517/CRR127982/CRR127982_r2.fq.gz -O seq/L2_2.fq.gz
     gunzip seq/*.gz
-    # Downlad database
-    wget -c http://www.drive5.com/sintax/rdp_16s_v16_sp.fa.gz
-    gunzip *.gz
 
 ### 1. Write the metadata mapping files
 
@@ -43,19 +46,24 @@ For multiple libraries, we need a library list file "result/library.txt". Then u
         cut -f 1 -d '_' | uniq \
         > result/library.txt
         
-    # Loop write mapping file. For different paramters of each library need write manual
+    # Loop write mapping file. 
+    # Method 1. For same paramters of each library need write manual
     for l in `cat result/library.txt`; do
     write_mapping_file.pl \
-        -i ${wd}/script/barcodeF96.txt \
-        -b ${wd}/script/barcodeR48.txt \
+        -i ${db}/script/barcodeF96.txt \
+        -b ${db}/script/barcodeR48.txt \
         -F AACMGGATTAGATACCCKG \
         -R ACGTCATCCCCACCTTCC \
         -L ${l} -p 48 -v Nippobare \
         -c Root -m TSB -B 1 -s Rice -d WildType \
         -o seq/${l}.txt
     done
+    
+    # Method 2. For different paramters of each library
+    awk -v nar="$db" 'BEGIN{OFS=FS="\t"}{system("write_mapping_file.pl -i "nar"/script/barcodeF96.txt -b "nar"/script/barcodeR48.txt -F AACMGGATTAGATACCCKG -R ACGTCATCCCCACCTTCC -L "$1" -p 48 -v "$5" -c "$6" -m "$4" -B "$7" -s "$3" -d "$9" -o seq/"$1".txt");}' <(tail -n+2 doc/library.txt)
 
     # Merge mapping file(s) into one metadata
+    l=`tail -n+2 result/library.txt|cut -f1|head -n1`
     cat <(head -n1 seq/${l}.txt | sed 's/#//g') \
         <(cat seq/*.txt |grep -v '#'|grep -v -P '^SampleID\t') \
         > result/metadata.txt
@@ -79,33 +87,45 @@ If you write the mapping files manually, validate the mapping file(s) format is 
 
 Merge pair-end reads into single-end reads. Most amplicon sequencing using Illumina HiSeq2500/NovaSeq6000 platform on pair-end 250 bp mode. We first merged the pair-end into sing-end reads, according the complement of the reads end.
 
-    for l in `cat result/library.txt`; do
-    time vsearch -fastq_mergepairs seq/${l}_1.fq \
+    # Method 1. One by one, 8s, 5m9s
+    time for l in `cat result/library.txt`; do
+    vsearch -fastq_mergepairs seq/${l}_1.fq \
         -reverse seq/${l}_2.fq \
 	    -fastqout temp/${l}.fq
 	done
+
+    # Method 2. Parallel, 3s, 3m15s
+    time cat result/library.txt|rush -j 3 \
+      'vsearch -fastq_mergepairs \
+        seq/{1}_1.fq -reverse seq/{1}_2.fq \
+	    -fastqout temp/{1}.fq'
 
 ### 4. Demultiplexing
 
 Demultiplexing means split library into samples. We sequenced 4608(48 plates * 96 wells) samples in one library, and pair-end barcodes to index each sample. We need to remove these barcodes and rename sequences according to mapping files. QIIME provides scripts to deal these problems. We can extract barcodes by `extract_barcodes.py`, and rename each sequences name according to Sample ID by `split_libraries_fastq.py`.
 
-    for l in `cat result/library.txt`; do
-    # extract barcodes, 1m37s, note barcode length
-    extract_barcodes.py \
-        -f temp/${l}.fq -m seq/${l}.txt \
+    # extract barcodes, 1-15m, note barcode length
+    time cat result/library.txt|rush -j 3 \
+      'extract_barcodes.py \
+        -f temp/{1}.fq -m seq/{1}.txt \
     	-c barcode_paired_stitched \
     	--bc1_len 10 --bc2_len 6 \
     	-a --rev_comp_bc2 \
-    	-o temp/${l}
+    	-o temp/{1}'
+
     # split library, 2m8s
-    split_libraries_fastq.py \
-        -i temp/${l}/reads.fastq \
-        -b temp/${l}/barcodes.fastq \
-    	-m seq/${l}.txt \
+    time cat result/library.txt|rush -j 3 \
+      'split_libraries_fastq.py \
+        -i temp/{1}/reads.fastq \
+        -b temp/{1}/barcodes.fastq \
+    	-m seq/{1}.txt \
     	-q 19 --max_barcode_errors 0 \
     	--barcode_type 16 --phred_offset 33 \
-    	-o temp/${l}
+    	-o temp/{1}'
+
 	# format to usearch
+	rm -rf temp/qc.fa
+    for l in `cat result/library.txt`; do
 	cut -f 1 -d ' ' temp/${l}/seqs.fna \
 	    | sed 's/_/./' \
 	    >> temp/qc.fa
@@ -148,25 +168,24 @@ Visualize counts of samples in library. We using home-made script to visualize t
 
 Remove the forward and reverse primers by length.
 
-    # length of primers used, 10s
-    time usearch -fastx_truncate temp/qc.fa \
-    	-stripleft 19 -stripright 18 \
-    	-fastaout temp/filtered.fa 
-
+    # 1s-2m
+    time vsearch --fastx_filter temp/qc.fa \
+      --fastq_stripleft 19 --fastq_stripright 18 \
+      --fastaout temp/filtered.fa
+      
 ### 7. Pick representative sequences
 
 Pick representative sequences. We first remove the redundancy of all reads, and calculate the frequency of reads. Then using unoise3 algorithm to denoise into amplicon sequence variants (ASV).
 
-    # Calculate frequency of non-redundancy reads, 4s
-    vsearch \
-        --derep_fulllength temp/filtered.fa \
-    	--relabel Uni --minuniquesize 8 --sizeout \
-    	--output temp/uniques.fa 
+    # Calculate frequency of reads, 4s-3m
+    time vsearch --derep_fulllength temp/filtered.fa \
+    	--relabel Uni --minuniquesize 20 --sizeout \
+    	--output temp/uniques.fa
+    ls -hs temp/uniques.fa
 
     # Denoise by unoise3, 2s
-    usearch -unoise3 temp/uniques.fa \
+    usearch -unoise3 temp/uniques.fa -minsize 20 \
         -zotus temp/Zotus.fa
-    
     # Rename to ASV
     awk 'BEGIN {n=1}; />/ {print ">ASV_" n; n++} !/>/ {print}' temp/Zotus.fa \
         > result/ASV.fa
@@ -175,7 +194,7 @@ Pick representative sequences. We first remove the redundancy of all reads, and 
 
 Construct ASV table. Finally, we map all clean amplicon against the ASV to quantify the frequency in each sample.
  
-	# 99.07% matched, 38s
+	# 99.07% matched, 38s-30m
 	vsearch --usearch_global temp/filtered.fa \
 	    --db result/ASV.fa \
         --otutabout temp/ASV_table.txt \
@@ -198,9 +217,10 @@ False discovery rate control. Amplicon sequencing of each well is easily contami
         --negative A12 \
         --positive B12 \
         --output result/fdr.txt
+    cat result/fdr.txt
 
     # Filter flase discovery well in feature table
-    # e.g. Deleted 704 / 5696 samples
+    # e.g. Deleted 704/5696; 8313/30601 samples
     usearch -otutab_trim temp/ASV_table.txt \
         -output result/ASV_table.txt \
         -min_sample_size `cat result/fdr.txt` 
@@ -209,8 +229,6 @@ False discovery rate control. Amplicon sequencing of each well is easily contami
     head -n1 result/ASV_table.txt | cut -f2- | \
         sed 's/\t/\n/g' | cut -c1-5 | sort | \
         uniq -c | sort -k1,1n
-
-![image](http://210.75.224.110/github/Culturome/result/fdr.txt.control.png)
 
 ![image](http://210.75.224.110/github/Culturome/script/fig/fdr.txt.control.png)
 
@@ -222,7 +240,7 @@ False discovery rate control. Amplicon sequencing of each well is easily contami
 Taxonomic classification. Based on RDP train set 16 databases, we use sintax to classify taxonomy of ASV. The confidence cutoff set ot 0.6.
 
     usearch -sintax result/ASV.fa \
-	    -db ${wd}/rdp_16s_v16_sp.fa \
+	    -db ${db}/db/rdp_16s_v16_sp.fa \
     	-tabbedout temp/ASV.fa.tax \
     	-sintax_cutoff 0.6 -strand both
     # summary phylum and genus, format to table, 3m
@@ -235,7 +253,7 @@ Taxonomic classification. Based on RDP train set 16 databases, we use sintax to 
 Combining ASV table and taxonomy, evaluate the saturation of bacterial ASV diversity according to the number of wells containing bacteria (Fig. 5), overview the distribution of wells containing different numbers of ASVs or genera (Fig. 6), and examine the purity of cultivated bacteria in each well (Fig. 7). The outputs include two tables: an ASV list (isolate_ASV.txt) including five wells containing bacteria having corresponding 16S rRNA sequence; a well list (isolate_well.txt) including all detected ASV sequences and taxonomy. 
 
     # Claculate tables and figures, 2m
-    identify_isolate.R \
+    time identify_isolate.R \
         --input result/ASV_table.txt \
         --taxonomy result/taxonomy_8.txt \
         --output result/isolate
@@ -262,7 +280,7 @@ Table 2. Candidate wells and taxonomy of each ASV in ASV list (`isolate_ASV.txt`
 
 Table 3. Counts, purity and taxonomy in each well (`isolate_sample.txt`)
 
-    # Each well purity in plate
+    # (Optional) Each well purity in plate
     mkdir -p result/purity
     for l in `cat result/library.txt`; do
     # Prepare input file
@@ -297,7 +315,7 @@ Summarize the taxonomic distribution and occurrence frequency of cultivated bact
         --abundance 0 \
         --number 150
     # Plot graphlan
-    graphlan_plot.sh -i ${wd} \
+    graphlan_plot.sh -i ${db} \
         -o result/graphlan
 
 ![image](http://210.75.224.110/github/Culturome/script/fig/graphlan.png)
@@ -309,10 +327,24 @@ Summarize the taxonomic distribution and occurrence frequency of cultivated bact
 When the project is complete, you can compress input files and delete temporary files to save space.
 
     # Compress raw data and database
-    gzip seq/*.fq *.fa
+    gzip seq/*.fq
     # Delete temporary files
     rm -r temp
     # Packaging results
-    zip script/result_multiple.zip -r result/
+    zip result.zip -r result/
 
 All the important results in `result` folder.
+
+## Change log
+
+### 2020-08-12 v1.0
+
+Finished single and multiple libraries analysis pipeline, include script, virtualbox and webserver
+
+### 2022-03-21 v1.1
+
+1. Make a conda package for personal computer run in Windows subsystems for Linux
+2. Test on 20GB data included 7 libraries
+3. vsearch replace usearch in cut primer step
+
+

@@ -1,21 +1,25 @@
-# Culturome pipeline v1.0
+[TOC]
+
+# Culturome pipeline v1.1
+
+Date: 2022-03-21
 
 Authors: Yong-Xin Liu (yxliu@genetics.ac.cn), Yuan Qin (yqin@genetics.ac.cn)
 
-Date: 2020-08-12
+Citation: Jingying Zhang, Yong-Xin Liu, Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert, et al. 2021. High-throughput cultivation and identification of bacteria from the plant root microbiota. **Nature Protocols** 16: 988-1012. https://doi.org/10.1038/s41596-020-00444-7
 
 This is an pipeline for one sequencing library. For multiple sequencing libraries, please follow `pipeline_multiple.md`.
-
-If use it, please cite: Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, doi: https://doi.org/10.1038/s41596-020-00444-7
 
 ## Procedure
 
 Modify `wd` to absolute directory of `Culturome`, then run the following script to initialize your environment. set your library ID in the variable `l`.
 
+    # 工作目录 
+    wd=~/github/Culturome
     # e.g. pipeline in my github directory
     wd=~/github/Culturome
     # e.g. pipeline in Virtualbox image
-    wd=/home/qiime/Culturome-master
+    # wd=/home/qiime/Culturome-master
     PATH=${wd}/script:$PATH
     mkdir -p temp result
     l=L1
@@ -70,7 +74,7 @@ The 250-bp paired reads from HiSeq2500/NovaSeq6000 are merged according to the r
 
 According to the mapping file, remove plate and well barcodes (`extract_barcodes.py`), relabel sequences with the ID of plates and wells (`split_libraries_fastq.py`), and adjust the name of sequences to the format compatible with USEARCH. 
 
-    # 1m37s, barcode legnth in mapping file
+    # 1-20m, barcode legnth in mapping file
     extract_barcodes.py \
         -f temp/${l}.fq -m ${l}.txt \
         -c barcode_paired_stitched \
@@ -78,7 +82,7 @@ According to the mapping file, remove plate and well barcodes (`extract_barcodes
         -a --rev_comp_bc2 \
         -o temp/${l}
 
-    # 2m8s, relabel reads
+    # 2-35m, relabel reads
     split_libraries_fastq.py \
         -i temp/${l}/reads.fastq \
         -b temp/${l}/barcodes.fastq \
@@ -91,18 +95,18 @@ According to the mapping file, remove plate and well barcodes (`extract_barcodes
 	cut -f 1 -d ' ' temp/${l}/seqs.fna | \
         sed 's/_/./' > temp/qc.fa
 
-### 5. isualize sequence counts
+### 5. Visualize sequence counts
 
 Visualize sequence counts from each plate to check the success and evenness of amplicon sequencing. For more details, please type `stat_split_bar.R -h`.
 
-    # When outputting multiple files, create subdirectories
+    # outputting multiple files in directories
     mkdir -p result/split
     # Adjust input file format
     tail -n+16 temp/${l}/split_library_log.txt| \
         head -n-4 > result/split/${l}.txt
     # Visualize counts of well and plate
     stat_split_bar.R \
-        --input L1.txt \
+        --input ${l}.txt \
         --database result/split/${l}.txt \
         --output result/split/
         
@@ -125,9 +129,13 @@ Visualize sequence counts from each plate to check the success and evenness of a
 
 ### 6. Remove forward and reverse primer sequences
 
-    usearch -fastx_truncate temp/qc.fa \
-        -stripleft 19 -stripright 18 \
-        -fastaout temp/filtered.fa 
+    #usearch -fastx_truncate temp/qc.fa \
+    #    -stripleft 19 -stripright 18 \
+    #    -fastaout temp/filtered.fa
+    vsearch --fastx_filter temp/qc.fa \
+      --fastq_stripleft 19 --fastq_stripright 18 \
+      --fastq_maxee_rate 0.01 \
+      --fastaout temp/filtered.fa
 
 ### 7. Identify amplicon sequence variants (ASVs)
 
@@ -287,4 +295,16 @@ When the project is complete, you can compress input files and delete temporary 
     rm -r temp
     # Packaging results
     zip script/result_single.zip -r result/
+
+## Change log
+
+### 2020-08-12 v1.0
+
+Finished single and multiple libraries analysis pipeline, include script, virtualbox and webserver
+
+### 2022-03-21 v1.1
+
+Make a conda package for personal computer run in Windows subsystems for Linux
+
+
 
