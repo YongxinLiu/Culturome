@@ -4,7 +4,7 @@
 
 Authors: Yong-Xin Liu (yxliu@genetics.ac.cn), Yuan Qin (yqin@genetics.ac.cn)
 
-Date: 2022-03-21
+Date: 2022-03-28
 
 This is an example pipeline for multiple libraries.
 
@@ -18,12 +18,9 @@ Setup work directory (`wd`) to your project.
 
 Modify `db` to absolute directory of `Culturome`, then run the following script to initial your environment.
     
-    wd=~/culture/ginseng/C220314L7
-    db=/mnt/bai/yongxin/github/Culturome
-    PATH=${db}/script:$PATH
-    # PATH include software, conda and bin
-    # PATH=/mnt/bai/yongxin/github/Culturome/script:/mnt/bai/meta/miniconda3/envs/culturome/bin:/usr/bin:/bin
-    rm -rf temp result
+    wd=/mnt/d/culture
+    mkdir -p $wd && cd $wd
+    db=~/github/Culturome
     mkdir -p seq temp result
 
 (Option: test data)Make sure you have downloaded `Culturome` directory, and set the right path. Input fastq (unzipped) files in `seq` folder, and database in current folder is ready. The following codes to download example data, and database.
@@ -60,7 +57,7 @@ For multiple libraries, we need a library list file "result/library.txt". Then u
     done
     
     # Method 2. For different paramters of each library
-    awk -v nar="$db" 'BEGIN{OFS=FS="\t"}{system("write_mapping_file.pl -i "nar"/script/barcodeF96.txt -b "nar"/script/barcodeR48.txt -F AACMGGATTAGATACCCKG -R ACGTCATCCCCACCTTCC -L "$1" -p 48 -v "$5" -c "$6" -m "$4" -B "$7" -s "$3" -d "$9" -o seq/"$1".txt");}' <(tail -n+2 doc/library.txt)
+    # awk -v nar="$db" 'BEGIN{OFS=FS="\t"}{system("write_mapping_file.pl -i "nar"/script/barcodeF96.txt -b "nar"/script/barcodeR48.txt -F AACMGGATTAGATACCCKG -R ACGTCATCCCCACCTTCC -L "$1" -p 48 -v "$5" -c "$6" -m "$4" -B "$7" -s "$3" -d "$9" -o seq/"$1".txt");}' <(tail -n+2 doc/library.txt)
 
     # Merge mapping file(s) into one metadata
     l=`tail -n+2 result/library.txt|cut -f1|head -n1`
@@ -79,22 +76,13 @@ Table 1. Example of the mapping file. Mapping file must start with #SampleID. Sa
 If you write the mapping files manually, validate the mapping file(s) format is requirement. There are many format requirements for mapping file, and errors will affect the following analysis. Using `validate_mapping_file.py` form QIIME to check whether the format of mapping file is OK. If show message "`No errors or warnings were found in mapping file.`" means your file is corrected. Otherwise to revise your mapping file according to output report (`*.html, *.log and *_corrected.txt`).
 
     for l in `cat result/library.txt`; do
-    validate_mapping_file.py -m seq/${l}.txt \
-        -o temp/
-    done
+      validate_mapping_file.py -m seq/${l}.txt -o temp/;done
 
 ### 3. Merge pair-end reads
 
 Merge pair-end reads into single-end reads. Most amplicon sequencing using Illumina HiSeq2500/NovaSeq6000 platform on pair-end 250 bp mode. We first merged the pair-end into sing-end reads, according the complement of the reads end.
 
-    # Method 1. One by one, 8s, 5m9s
-    time for l in `cat result/library.txt`; do
-    vsearch -fastq_mergepairs seq/${l}_1.fq \
-        -reverse seq/${l}_2.fq \
-	    -fastqout temp/${l}.fq
-	done
-
-    # Method 2. Parallel, 3s, 3m15s
+    # Parallel, 3s, 3m15s
     time cat result/library.txt|rush -j 3 \
       'vsearch -fastq_mergepairs \
         seq/{1}_1.fq -reverse seq/{1}_2.fq \
@@ -128,8 +116,7 @@ Demultiplexing means split library into samples. We sequenced 4608(48 plates * 9
     for l in `cat result/library.txt`; do
 	cut -f 1 -d ' ' temp/${l}/seqs.fna \
 	    | sed 's/_/./' \
-	    >> temp/qc.fa
-	done
+	    >> temp/qc.fa; done
 
 ### 5. Summary counts of well and plate
 
@@ -183,27 +170,20 @@ Pick representative sequences. We first remove the redundancy of all reads, and 
     	--output temp/uniques.fa
     ls -hs temp/uniques.fa
 
-    # Denoise by unoise3, 2s
-    usearch -unoise3 temp/uniques.fa -minsize 20 \
-        -zotus temp/Zotus.fa
-    # Rename to ASV
-    awk 'BEGIN {n=1}; />/ {print ">ASV_" n; n++} !/>/ {print}' temp/Zotus.fa \
-        > result/ASV.fa
+    # Denoise by unoise3 of vsearch, 2s
+    vsearch --cluster_unoise temp/uniques.fa --minsize 20 --centroids temp/Zotus.fa
+    vsearch --uchime3_denovo temp/Zotus.fa --relabel ASV_ --nonchimeras result/ASV.fa
+    
 
 ### 8. Construct ASV table
 
 Construct ASV table. Finally, we map all clean amplicon against the ASV to quantify the frequency in each sample.
  
 	# 99.07% matched, 38s-30m
-	vsearch --usearch_global temp/filtered.fa \
+	time vsearch --usearch_global temp/filtered.fa \
 	    --db result/ASV.fa \
         --otutabout temp/ASV_table.txt \
         --id 0.97
-    
-    # Stat, e.g. 2678 samples, 378 OTUs
-    usearch -otutab_stats temp/ASV_table.txt \
-        -output temp/ASV_table.stat
-    cat temp/ASV_table.stat
 
 ### 9. False discovery rate control
 
@@ -220,10 +200,11 @@ False discovery rate control. Amplicon sequencing of each well is easily contami
     cat result/fdr.txt
 
     # Filter flase discovery well in feature table
-    # e.g. Deleted 704/5696; 8313/30601 samples
-    usearch -otutab_trim temp/ASV_table.txt \
-        -output result/ASV_table.txt \
-        -min_sample_size `cat result/fdr.txt` 
+    # e.g. Deleted 691 / 5676; 8313/30601 samples
+    otutab_trim.R \
+        --input temp/ASV_table.txt \
+        --min_sample_size `cat result/fdr.txt` \
+        --output result/ASV_table.txt
     
     # Well number in each plate
     head -n1 result/ASV_table.txt | cut -f2- | \
@@ -239,22 +220,27 @@ False discovery rate control. Amplicon sequencing of each well is easily contami
 
 Taxonomic classification. Based on RDP train set 16 databases, we use sintax to classify taxonomy of ASV. The confidence cutoff set ot 0.6.
 
-    usearch -sintax result/ASV.fa \
-	    -db ${db}/db/rdp_16s_v16_sp.fa \
-    	-tabbedout temp/ASV.fa.tax \
-    	-sintax_cutoff 0.6 -strand both
-    # summary phylum and genus, format to table, 3m
-    tax_sum.sh -i temp/ASV.fa.tax \
-        -d result/ASV_table.txt \
-        -o result/
+    vsearch --sintax result/ASV.fa --db ${db}/db/rdp_16s_v16_sp.fa --tabbedout temp/ASV.fa.tax --sintax_cutoff 0.6
+    
+    # summary phylum and genus, format to table, 3-30m
+    cut -f 1,4 temp/ASV.fa.tax | sed 's/\td/\tk/;s/:/__/g;s/,/;/g;s/"//g;s/\/Chloroplast//' > result/taxonomy_2.txt
+    awk 'BEGIN{OFS=FS="\t"} {delete a; a["k"]="Unassigned";a["p"]="Unassigned";a["c"]="Unassigned";a["o"]="Unassigned";a["f"]="Unassigned";a["g"]="Unassigned";a["s"]="Unassigned"; split($2,x,";");for(i in x){split(x[i],b,"__");a[b[1]]=b[2];} print $1,a["k"],a["p"],a["c"],a["o"],a["f"],a["g"],a["s"];}' result/taxonomy_2.txt | sed '1 i #OTU ID\tKingdom\tPhylum\tClass\tOrder\tFamily\tGenus\tSpecies' |sed 's/#//g;s/ //g' > result/taxonomy_8.txt
+    # ASV table to genus table
+    awk 'BEGIN{FS=OFS="\t"} NR==FNR{a[$1]=$7} NR>FNR{print $0,a[$1]}' \
+      result/taxonomy_8.txt result/ASV_table.txt | \
+    	sed '/\t$/d' | sed '1 s/Genus/KO/' > result/ASV_table7.txt
+    # 转换为基因表
+    mat_gene2ko.R -i result/ASV_table7.txt \
+      -o result/genus -n 1000000
 
-### 11. Identify non-redundancy isolates.
+### 11. Identify non-redundancy isolates
 
 Combining ASV table and taxonomy, evaluate the saturation of bacterial ASV diversity according to the number of wells containing bacteria (Fig. 5), overview the distribution of wells containing different numbers of ASVs or genera (Fig. 6), and examine the purity of cultivated bacteria in each well (Fig. 7). The outputs include two tables: an ASV list (isolate_ASV.txt) including five wells containing bacteria having corresponding 16S rRNA sequence; a well list (isolate_well.txt) including all detected ASV sequences and taxonomy. 
 
     # Claculate tables and figures, 2m
     time identify_isolate.R \
         --input result/ASV_table.txt \
+        --genus result/genus.count \
         --taxonomy result/taxonomy_8.txt \
         --output result/isolate
 
@@ -315,8 +301,7 @@ Summarize the taxonomic distribution and occurrence frequency of cultivated bact
         --abundance 0 \
         --number 150
     # Plot graphlan
-    graphlan_plot.sh -i ${db} \
-        -o result/graphlan
+    graphlan_plot.sh -i ~/Culturome -o result/graphlan
 
 ![image](http://210.75.224.110/github/Culturome/script/fig/graphlan.png)
 
@@ -346,5 +331,7 @@ Finished single and multiple libraries analysis pipeline, include script, virtua
 1. Make a conda package for personal computer run in Windows subsystems for Linux
 2. Test on 20GB data included 7 libraries
 3. vsearch replace usearch in cut primer step
+4. rscript replace stat of usearch
+5. Test on WSL Ubuntu 20.04
 
 
