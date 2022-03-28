@@ -1,9 +1,9 @@
 #!/usr/bin/env Rscript
 
-# Copyright 2016-2020 Yuan Qin <yqin@genetics.ac.cn> Yong-Xin Liu <yxliu@genetics.ac.cn>
+# Copyright 2016-2022 Yong-Xin Liu <metagenome@126.com>
 
 # If used this script, please cited:
-# Jingying Zhang, Yong-Xin Liu, et. al. NRT1.1B is associated with root microbiota composition and nitrogen use in field-grown rice. Nature Biotechnology 37, 676-684, doi:10.1038/s41587-019-0104-4 (2019).
+# Yong-Xin Liu, Yuan Qin, Tong Chen, Meiping Lu, Xubo Qian, Xiaoxuan Guo, et al. 2021. A practical guide to amplicon and metagenomic analysis of microbiome data. Protein & Cell 12: 315-330. https://doi.org/10.1007/s13238-020-00724-8
 
 # 手动运行脚本，使用 Ctrl+Shift+H 或 Session 需要设置工作目录
 # Set Work Directory - Choose Directory / To Source File Location
@@ -35,6 +35,8 @@ if (TRUE){
     make_option(c("-i", "--input"), type="character", default="result/ASV_table.txt",
                 help="Unfiltered OTU table [default %default]"),
     make_option(c("-t", "--taxonomy"), type="character", default="result/taxonomy_8.txt",
+                help="metadata file or metadata [default %default]"),
+    make_option(c("-g", "--genus"), type="character", default="result/genus.count",
                 help="metadata file or metadata [default %default]"),
     make_option(c("-o", "--output"), type="character", default="result/isolate",
                 help="Output quantile value for filter feature table [default %default]") 
@@ -261,7 +263,7 @@ df$Freq = as.numeric(df$Freq)
 # ggsave(paste(opts$output, ".ASVdistribution.png", sep=""), p, width = 4, height = 3)
 
 # 统计每个样品属的数量
-genus_table = read.delim("result/tax/sum_g.txt", row.names= 1,  header=T, sep="\t")
+genus_table = read.delim(opts$genus, row.names= 1,  header=T, sep="\t")
 genus_table2 = genus_table
 genus_table2[genus_table > 0] = 1
 Number = as.data.frame(colSums(genus_table2))
