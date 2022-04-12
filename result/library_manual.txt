@@ -1,0 +1,8 @@
+1	2	3	4	5	6	7	8	9
+ID	Filename	Species	Media	Variety	Compartment	Batch	Plate	Description
+L1	Plant_TPP_8340-1a	Rice	TSB	ZH11	Root	1	48	NA
+L2	Plant_T411_8341-1a	Rice	R2A	ZH11	Rhizosphere	2	45	NA
+L3	Plant_T299_8342-1a	Rice	R2A	Nipponbare	Root	2	45	NA
+L4	Plant_T117_8343-1a	Arabidopsis	TSB	Col0	Root	3	48	NA
+L5	Plant_L117_8344-1a	Arabidopsis	TSB	Ler	Root	3	45	NA
+L6	Plant_THE_8345-1a	Arabidopsis	R2A	Ler	Rhizosphere	4	48	NA
