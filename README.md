@@ -4,27 +4,28 @@
 
 This is the computational part of the detailed protocol for high-throughput bacterial isolation and cultivation. Now is published in Nature Protocols.
 
-> Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, 16(2): 988-1012: https://doi.org/10.1038/s41596-020-00444-7
+> Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***, 16(2): 988-1012: https://doi.org/10.1038/s41596-020-00444-7 (Highly Cited Paper) <span class="__dimensions_badge_embed__" data-doi="10.1038/s41596-020-00444-7" data-hide-zero-citations="true" data-style="small_rectangle"></span><script async src="https://badge.dimensions.ai/badge.js" charset="utf-8"></script>
+
 
 The overview of the workflow is in the following figures. 
 
 
-![image](http://210.75.224.110/github/Culturome/script/fig/fig1.jpg)
+![image](http://bailab.genetics.ac.cn/github/Culturome/script/fig/fig1.jpg)
 
 **Figure 1 | Overview of the high-throughput bacterial cultivation and identification system.**
 
-![image](http://210.75.224.110/github/Culturome/script/fig/fig4.jpg)
+![image](http://bailab.genetics.ac.cn/github/Culturome/script/fig/fig4.jpg)
 
 **Figure 2 | Workflow of bioinformatic analysis to identify cultivated bacteria**. a, Summary of the steps from obtaining raw data to generating clean sequences of the amplified 16S rRNA gene region. b, Workflow to identify amplicon sequence variants (ASVs) and taxonomy. c, Sequence and taxonomy information for cultivated bacteria in 96-well cell culture plates.
 
-![image](http://210.75.224.110/github/Culturome/script/fig/fig6.jpg)
+![image](http://bailab.genetics.ac.cn/github/Culturome/script/fig/fig6.jpg)
 
 **Fig. 3 | Anticipated results for bacterial cultivation.**
 a. Bar plot showing the distribution of read counts in each plate. b. Read counts for the negative (nuclease-free water as the PCR template) and positive controls (*E. coli* DNA as the PCR template). c. Rarefaction curve of ASVs based on the number of wells containing bacteria. d. Distribution of wells regarding the purity based on evaluation of ASVs of the bacterial 16S rRNA gene. e. An example of the purity of wells containing cultivated bacteria in a 96-well cell culture plate. f. Cladogram showing the taxonomic distribution and occurrence frequency of cultivated bacteria.
 
 ## Equipment
 
-Personal computer running with 64-bit Linux Ubuntu 16.04+ or CentOS 7.5+, at least dual-core 2.4 GHz, 4 GB of RAM (8 GB preferred) and 30 GB space. The analysis pipeline is mainly based on QIIME, VSEARCH, GraPhlAn and home-made scripts (Culturome pipeline). All the home-made scripts and manual is deposit in https://github.com/YongxinLiu/Culturome. The dependency databases is RDP. To simplify the installation procedure for all computational software, we provide a conda pack for download. Additionally, a graphic user interface Webserver have be construct for user to analysis culturomics data online http://bailab.genetics.ac.cn/culturome/, and fully installed VirtualBox image http://210.75.224.110/culturome/download/QIIME-1.9.1-amd64.zip (6 GB).
+Personal computer running with 64-bit Linux Ubuntu 16.04+ or CentOS 7.5+, at least dual-core 2.4 GHz, 4 GB of RAM (8 GB preferred) and 30 GB space. The analysis pipeline is mainly based on QIIME, VSEARCH, GraPhlAn and home-made scripts (Culturome pipeline). All the home-made scripts and manual is deposit in https://github.com/YongxinLiu/Culturome. The dependency databases is RDP. To simplify the installation procedure for all computational software, we provide a conda pack for download. Additionally, a graphic user interface Webserver have be construct for user to analysis culturomics data online http://bailab.genetics.ac.cn/culturome/, and fully installed VirtualBox image http://bailab.genetics.ac.cn/culturome/download/QIIME-1.9.1-amd64.zip (6 GB).
 
 ### Computer requirements
 
@@ -70,7 +71,7 @@ For Linux users, include Windows subsystem for Linux
 
     # Install culturome conda environment
     n=culturome
-    wget -c http://210.75.224.110/db/conda/${n}.tar.gz
+    wget -c http://bailab.genetics.ac.cn/db/conda/${n}.tar.gz
     mkdir -p ~/miniconda3/envs/${n}
     tar -xvzf ${n}.tar.gz -C ~/miniconda3/envs/${n}
     conda activate $n
@@ -81,7 +82,7 @@ For Linux users, include Windows subsystem for Linux
     # For windows usea change to c:
     wd=/mnt/c/microbiome 
     mkdir -p $wd && cd $wd
-    wget -c http://210.75.224.110/db/Culturome.tar.gz
+    wget -c http://bailab.genetics.ac.cn/db/Culturome.tar.gz
     tar xvzf Culturome.tar.gz
     chmod +x Culturome/script/*
     echo export PATH=`pwd`/Culturome/script:\$PATH >>  ~/.bashrc
@@ -90,7 +91,7 @@ For Linux users, include Windows subsystem for Linux
 For Mac users
 
     n=culturome
-    wget -c http://210.75.224.110/db/conda/${n}_mac.tar.gz
+    wget -c http://bailab.genetics.ac.cn/db/conda/${n}_mac.tar.gz
     mv ${n}_mac.tar.gz ${n}.tar.gz
     mkdir -p ~/miniconda3/envs/${n}
     tar -xvzf ${n}.tar.gz -C ~/miniconda3/envs/${n}
@@ -100,7 +101,7 @@ For Mac users
     # Install culturome pipeline
     wd=~/Documents/microbiome
     mkdir $wd && cd $wd
-    wget -c http://210.75.224.110/db/Culturome.tar.gz
+    wget -c http://bailab.genetics.ac.cn/db/Culturome.tar.gz
     tar xvzf Culturome.tar.gz
     cp -f Culturome/mac/* Culturome/script/
     chmod +x Culturome/script/*
@@ -140,7 +141,7 @@ To install Cultrome pipeline, download them from Github, unzip the zip file and 
     mv Culturome-master Culturome
     
     # Method2. Download from backup site
-    wget -c http://210.75.224.110/db/Culturome.tar.gz
+    wget -c http://bailab.genetics.ac.cn/db/Culturome.tar.gz
     tar xvzf Culturome.tar.gz
     
     # Add environment variables permanently 
@@ -150,7 +151,7 @@ To install Cultrome pipeline, download them from Github, unzip the zip file and 
 
 ### Method 3. VirtualBox & Webserver
 
-To simplify the installation procedure for all computational software, we provide a fully installed VirtualBox image http://210.75.224.110/culturome/download/QIIME-1.9.1-amd64.zip, and a webserver https://github.com/YongxinLiu/Culturome.
+To simplify the installation procedure for all computational software, we provide a fully installed VirtualBox image http://bailab.genetics.ac.cn/culturome/download/QIIME-1.9.1-amd64.zip, and a webserver https://github.com/YongxinLiu/Culturome.
 
 ## Analysis protocols
 
@@ -158,17 +159,14 @@ Using Rstudio open the 1pipeline.sh, then start the analysis step by step.
 
 ## Contact
 
-Dr. Yong-Xin Liu
+Prof. Yong-Xin Liu
 
-Yang Bai's lab, State Key Laboratory of Plant Genomics (SKLPG),
-Institute of Genetics and Developmental Biology, Chinese Academy of Sciences
+Yong-Xin Liu's lab, Agricultural Genomics Institute at Shenzhen, Chinese Academy of Agricultural Sciences
 
-No.1 West Beichen Road, Chaoyang District, Beijing, 100101, China
+No 97, Buxin Road, Dapeng District, Shenzhen 518120, Guangdong, China
 
-Tel: +86-10-64808722
-
-E-mail: yxliu@genetics.ac.cn
+E-mail: liuyongxin@caas.cn
 
 Wechat: meta-genomics
 
-Cite: Jingying Zhang, [Yong-Xin Liu](http://bailab.genetics.ac.cn/YongxinLiuEn.html), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***,  https://doi.org/10.1038/s41596-020-00444-7
+Cite: Jingying Zhang, [Yong-Xin Liu](https://agis.caas.cn/en/research/principalinvestigator/4510ae674c0844289e50ae538d4bb6c3.htm), Xiaoxuan Guo, Yuan Qin, Ruben Garrido-Oter, Paul Schulze-Lefert & Yang Bai. (2021). High-throughput cultivation and identification of bacteria from the plant root microbiota. ***Nature Protocols***,  https://doi.org/10.1038/s41596-020-00444-7 <span class="__dimensions_badge_embed__" data-doi="10.1038/s41596-020-00444-7" data-hide-zero-citations="true" data-style="small_rectangle"></span><script async src="https://badge.dimensions.ai/badge.js" charset="utf-8"></script>
