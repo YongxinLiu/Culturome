@@ -57,7 +57,7 @@
 
 ### 2. 校验mapping file格式是否正确
 
-手动编写或修改的文章必须校验，确保下游分析顺利完成
+手动编写或修改的文件必须校验，确保下游分析顺利完成
 
     for l in `cat result/library.txt`; do
       validate_mapping_file.py -m seq/${l}.txt -o temp/;done
